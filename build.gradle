@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'ru.hse.java.hsqldb'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.projectlombok:lombok:1.18.18'
+    annotationProcessor 'org.projectlombok:lombok:1.18.8'
+    implementation 'com.opencsv:opencsv:5.5.2'
+    implementation 'org.hsqldb:hsqldb:2.5.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
