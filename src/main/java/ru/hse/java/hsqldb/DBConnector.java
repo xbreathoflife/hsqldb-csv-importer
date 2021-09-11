@@ -79,7 +79,7 @@ public class DBConnector {
                 for (String value : values) {
                     sql.append(delimiter)
                             .append('\'')
-                            .append(value)
+                            .append(value.replace("'", "''"))
                             .append('\'');
                     delimiter = ", ";
                 }
