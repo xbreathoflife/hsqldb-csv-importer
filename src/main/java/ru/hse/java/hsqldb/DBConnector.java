@@ -41,7 +41,6 @@ public class DBConnector {
         }
     }
 
-    // TODO: remove spaces
     public void addRecordsToDB(String tableName, ArrayList<List<String>> records) {
         if (records.isEmpty()) {
             System.out.println("Csv file is empty");
@@ -57,6 +56,10 @@ public class DBConnector {
 
         String delimiter = "";
         for (String name : columnNames) {
+            if (!name.matches("[_a-zA-Z0-9\\. ]+")) {
+                System.out.println("Column name " + name + "has wrong format!");
+                return;
+            }
             createTableTemplate.append(delimiter)
                     .append('\"')
                     .append(name)
@@ -66,9 +69,9 @@ public class DBConnector {
         }
         createTableTemplate.append(")");
 
-        try (Connection connection = DriverManager.getConnection(CONNECTION_STRING, USER, PASSWORD);
-             Statement statement = connection.createStatement()) {
-            statement.executeUpdate(createTableTemplate.toString());
+        try (Connection connection = DriverManager.getConnection(CONNECTION_STRING, USER, PASSWORD)) {
+            Statement createStatement = connection.createStatement();
+            createStatement.executeUpdate(createTableTemplate.toString());
 
             // Insert csv file data to created table
             String insertIntoTableTemplate = "INSERT INTO " + tableName + " VALUES (";
@@ -76,17 +79,19 @@ public class DBConnector {
                 List<String> values = records.get(i);
                 StringBuilder sql = new StringBuilder();
                 delimiter = "";
-                for (String value : values) {
-                    sql.append(delimiter)
-                            .append('\'')
-                            .append(value.replace("'", "''"))
-                            .append('\'');
+                for (int j = 0; j < values.size(); j++) {
+                    sql.append(delimiter).append("?");
                     delimiter = ", ";
                 }
                 sql.append(")");
-                statement.addBatch(insertIntoTableTemplate + sql);
+                PreparedStatement insertStatement = connection.prepareStatement(insertIntoTableTemplate + sql);
+                for (int j = 0; j < values.size(); j++) {
+                    insertStatement.setString(j + 1, values.get(j));
+                }
+
+                insertStatement.executeUpdate();
             }
-            statement.executeBatch();
+            System.out.println("Table \"" + tableName + "\" created successfully!");
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

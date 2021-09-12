@@ -19,6 +19,10 @@ public class Main {
             return;
         }
 
+        if (!tableName.matches("[_a-zA-Z0-9\\.]+")) {
+            System.out.println("Incorrect filename or tablename");
+            return;
+        }
         CSVParser csvParser = new CSVParser(csvFilePath);
         ArrayList<List<String>> records = csvParser.getRecords();
 
